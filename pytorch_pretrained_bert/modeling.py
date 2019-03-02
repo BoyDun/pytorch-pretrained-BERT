@@ -33,6 +33,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from .file_utils import cached_path
+from .answer_pointer import BoundaryPointer, answer_search
 
 logger = logging.getLogger(__name__)
 
@@ -1175,10 +1176,23 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         # self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
         self.apply(self.init_bert_weights)
+        pointer_hidden_size = 384
+        self.boundary = BoundaryPointer(
+            mode="LSTM", input_size=pointer_hidden_size * 2, hidden_size=pointer_hidden_size, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
-        logits = self.qa_outputs(sequence_output)
+        sequence_output_permute = sequence_output.permute(1,0,2)
+        ans_range_prop = self.boundary.forward(sequence_output_permute, attention_mask)
+        ans_range_prop = ans_range_prop.transpose(0, 1)
+
+        # answer range
+        if not self.training and self.enable_search:
+            ans_range = answer_search(ans_range_prop, attention_mask)
+        else:
+            _, ans_range = torch.max(ans_range_prop, dim=2)
+        logits = ans_range_prop.permute(0, 2, 1)
+        #logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)

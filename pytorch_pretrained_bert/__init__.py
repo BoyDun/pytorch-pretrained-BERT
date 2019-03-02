@@ -22,3 +22,4 @@ from .optimization import BertAdam
 from .optimization_openai import OpenAIAdam
 
 from .file_utils import PYTORCH_PRETRAINED_BERT_CACHE, cached_path
+from .answer_pointer import BoundaryPointer, answer_search
