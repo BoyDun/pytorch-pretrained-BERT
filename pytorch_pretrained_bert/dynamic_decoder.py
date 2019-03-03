@@ -1,3 +1,12 @@
+from __future__ import unicode_literals, print_function, division
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
+use_cuda = torch.cuda.is_available()
+
 class DynamicDecoder(nn.Module):
     def __init__(self, hidden_dim, maxout_pool_size, max_dec_steps, dropout_ratio):
         super(DynamicDecoder, self).__init__()
