@@ -33,7 +33,8 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from .file_utils import cached_path
-from answer_pointer import BoundaryPointer
+# from answer_pointer import BoundaryPointer
+from dynamic_decoder import DynamicDecoder
 
 logger = logging.getLogger(__name__)
 
@@ -1176,8 +1177,10 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         # self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
         self.apply(self.init_bert_weights)
-        self.boundary = BoundaryPointer(
-            mode="LSTM", input_size=, hidden_size=768, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
+#         self.boundary = BoundaryPointer(
+#             mode="LSTM", input_size=, hidden_size=768, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
+        #probably tune these hyperparams later
+        self.boundary = DynamicDecoder(hidden_dim=200, maxout_pool_size=16, max_dec_steps=4, dropout_ratio=0.15)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
