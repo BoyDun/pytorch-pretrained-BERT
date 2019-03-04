@@ -23,7 +23,7 @@ class DynamicDecoder(nn.Module):
         curr_mask_s,  curr_mask_e = None, None
         results_mask_s, results_s = [], []
         results_mask_e, results_e = [], []
-        step_losses = []
+#         step_losses = []
 
         mask_mult = (1.0 - d_mask.float()) * (-1e30)
         indices = torch.arange(0, b, out=torch.LongTensor(b))
@@ -52,17 +52,17 @@ class DynamicDecoder(nn.Module):
             lstm_out, dec_state_i = self.decoder(u_cat.unsqueeze(1), dec_state_i)
             h_i, c_i = dec_state_i
 
-            s_i_1, curr_mask_s, step_loss_s = self.maxout_start(h_i, U, curr_mask_s, s_i_1,
+            s_i_1, curr_mask_s = self.maxout_start(h_i, U, curr_mask_s, s_i_1,
                                                                 u_cat, mask_mult, s_target)
             u_s_i_1 = U[indices, s_i_1, :]  # b x 2l
             u_cat = torch.cat((u_s_i_1, u_e_i_1), 1)  # b x 4l
 
-            e_i_1, curr_mask_e, step_loss_e = self.maxout_end(h_i, U, curr_mask_e, e_i_1,
+            e_i_1, curr_mask_e = self.maxout_end(h_i, U, curr_mask_e, e_i_1,
                                                               u_cat, mask_mult, e_target)
 
-            if span is not None:
-                step_loss = step_loss_s + step_loss_e
-                step_losses.append(step_loss)
+#             if span is not None:
+#                 step_loss = step_loss_s + step_loss_e
+#                 step_losses.append(step_loss)
 
             results_mask_s.append(curr_mask_s)
             results_s.append(s_i_1)
@@ -77,14 +77,14 @@ class DynamicDecoder(nn.Module):
         result_pos_e = result_pos_e - 1
         idx_e = torch.gather(torch.stack(results_e, 1), 1, result_pos_e.unsqueeze(1)).squeeze()
 
-        loss = None
+#         loss = None
 
-        if span is not None:
-            sum_losses = torch.sum(torch.stack(step_losses, 1), 1)
-            batch_avg_loss = sum_losses / self.max_dec_steps
-            loss = torch.mean(batch_avg_loss)
+#         if span is not None:
+#             sum_losses = torch.sum(torch.stack(step_losses, 1), 1)
+#             batch_avg_loss = sum_losses / self.max_dec_steps
+#             loss = torch.mean(batch_avg_loss)
 
-        return loss, idx_s, idx_e
+        return idx_s, idx_e #, loss
 
 
 class MaxOutHighway(nn.Module):
@@ -140,10 +140,10 @@ class MaxOutHighway(nn.Module):
             idx_i_1 = idx_i_1*curr_mask.long()
             curr_mask = (idx_i != idx_i_1)
 
-        step_loss = None
+#         step_loss = None
 
-        if target is not None:
-            step_loss = self.loss(alpha, target)
-            step_loss = step_loss * curr_mask.float()
+#         if target is not None:
+#            step_loss = self.loss(alpha, target)
+#            step_loss = step_loss * curr_mask.float()
 
-        return idx_i, curr_mask, step_loss
+        return idx_i, curr_mask #, step_loss
