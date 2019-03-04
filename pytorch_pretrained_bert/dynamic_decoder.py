@@ -3,9 +3,10 @@ from __future__ import unicode_literals, print_function, division
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
-from get_data import Processor
+# from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
+# from get_data import Processor
 
 use_cuda = torch.cuda.is_available()
 
@@ -18,8 +19,9 @@ class DynamicDecoder(nn.Module):
 
         self.maxout_start = MaxOutHighway(hidden_dim, maxout_pool_size, dropout_ratio)
         self.maxout_end = MaxOutHighway(hidden_dim, maxout_pool_size, dropout_ratio)
+        # self.processor = Processor()
 
-    def forward(self, U, d_mask, span):
+    def forward(self, U, d_mask):
         b, m, _ = list(U.size())
 
         curr_mask_s,  curr_mask_e = None, None
@@ -41,11 +43,11 @@ class DynamicDecoder(nn.Module):
             indices = indices.cuda()
 
         dec_state_i = None
-        s_target = None
-        e_target = None
-        if span is not None:
-            s_target = span[:, 0]
-            e_target = span[:, 1]
+        # s_target = None
+        # e_target = None
+        # if span is not None:
+            # s_target = span[:, 0]
+            # e_target = span[:, 1]
         u_s_i_1 = U[indices, s_i_1, :]  # b x 2l
         for _ in range(self.max_dec_steps):
             u_e_i_1 = U[indices, e_i_1, :]  # b x 2l
@@ -55,12 +57,12 @@ class DynamicDecoder(nn.Module):
             h_i, c_i = dec_state_i
 
             s_i_1, curr_mask_s, start_logits = self.maxout_start(h_i, U, curr_mask_s, s_i_1,
-                                                                u_cat, mask_mult, s_target)
+                                                                u_cat, mask_mult)
             u_s_i_1 = U[indices, s_i_1, :]  # b x 2l
             u_cat = torch.cat((u_s_i_1, u_e_i_1), 1)  # b x 4l
 
             e_i_1, curr_mask_e, end_logits = self.maxout_end(h_i, U, curr_mask_e, e_i_1,
-                                                              u_cat, mask_mult, e_target)
+                                                              u_cat, mask_mult)
 
 #             if span is not None:
 #                 step_loss = step_loss_s + step_loss_e
@@ -86,7 +88,7 @@ class DynamicDecoder(nn.Module):
 #             batch_avg_loss = sum_losses / self.max_dec_steps
 #             loss = torch.mean(batch_avg_loss)
 
-        return idx_s, idx_e, start_logits, end_logits #, loss
+        return idx_s, idx_e, start_logits, end_logits,  #, loss
 
 
 class MaxOutHighway(nn.Module):
@@ -108,7 +110,7 @@ class MaxOutHighway(nn.Module):
 
         self.loss = nn.CrossEntropyLoss()
 
-    def forward(self, h_i, U, curr_mask, idx_i_1, u_cat, mask_mult, target=None):
+    def forward(self, h_i, U, curr_mask, idx_i_1, u_cat, mask_mult):
         b, m, _ = list(U.size())
 
         r = F.tanh(self.r(torch.cat((h_i.view(-1, self.hidden_dim), u_cat), 1)))  # b x 5l => b x l
