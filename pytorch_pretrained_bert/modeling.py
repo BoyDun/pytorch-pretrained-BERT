@@ -1192,9 +1192,12 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         
         #reshape sequence output to #B x m x 2l
         #answer: batch_size x hidden x 2 for answers
-        #loss: batch_size x hidden x context_length for logits
+        #batch_size x hidden x context_length for logits
 
         print(sequence_output.shape)
+        print(input_ids.shape)
+        print(attention_mask.shape)
+
         _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #each logits var is b x m
         
         if start_positions is not None and end_positions is not None:
