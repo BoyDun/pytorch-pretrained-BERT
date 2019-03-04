@@ -5,6 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
+from get_data import Processor
+
 use_cuda = torch.cuda.is_available()
 
 class DynamicDecoder(nn.Module):
