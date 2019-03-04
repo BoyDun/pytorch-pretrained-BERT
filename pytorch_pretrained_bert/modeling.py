@@ -34,7 +34,7 @@ from torch.nn import CrossEntropyLoss
 
 from .file_utils import cached_path
 # from answer_pointer import BoundaryPointer
-from dynamic_decoder import DynamicDecoder
+from .dynamic_decoder import DynamicDecoder
 
 logger = logging.getLogger(__name__)
 
