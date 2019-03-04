@@ -131,9 +131,9 @@ class MaxOutHighway(nn.Module):
         alpha, _ = alpha.max(1)  # b*m
         alpha = alpha.view(-1, m) # b x m
 
-        logits = alpha + mask_mult  # b x m
-        alpha = F.log_softmax(logits, 1)  # b x m
-        _, idx_i = torch.max(alpha, dim=1)
+        alpha = alpha + mask_mult  # b x m
+        logits = F.log_softmax(alpha, 1)  # b x m
+        _, idx_i = torch.max(logits, dim=1)
 
         if curr_mask is None:
             curr_mask = (idx_i == idx_i)
