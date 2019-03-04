@@ -52,12 +52,12 @@ class DynamicDecoder(nn.Module):
             lstm_out, dec_state_i = self.decoder(u_cat.unsqueeze(1), dec_state_i)
             h_i, c_i = dec_state_i
 
-            s_i_1, curr_mask_s = self.maxout_start(h_i, U, curr_mask_s, s_i_1,
+            s_i_1, curr_mask_s, start_logits = self.maxout_start(h_i, U, curr_mask_s, s_i_1,
                                                                 u_cat, mask_mult, s_target)
             u_s_i_1 = U[indices, s_i_1, :]  # b x 2l
             u_cat = torch.cat((u_s_i_1, u_e_i_1), 1)  # b x 4l
 
-            e_i_1, curr_mask_e = self.maxout_end(h_i, U, curr_mask_e, e_i_1,
+            e_i_1, curr_mask_e, end_logits = self.maxout_end(h_i, U, curr_mask_e, e_i_1,
                                                               u_cat, mask_mult, e_target)
 
 #             if span is not None:
@@ -84,7 +84,7 @@ class DynamicDecoder(nn.Module):
 #             batch_avg_loss = sum_losses / self.max_dec_steps
 #             loss = torch.mean(batch_avg_loss)
 
-        return idx_s, idx_e #, loss
+        return idx_s, idx_e, start_logits, end_logits #, loss
 
 
 class MaxOutHighway(nn.Module):
@@ -146,4 +146,4 @@ class MaxOutHighway(nn.Module):
 #            step_loss = self.loss(alpha, target)
 #            step_loss = step_loss * curr_mask.float()
 
-        return idx_i, curr_mask #, step_loss
+        return idx_i, curr_mask, logits #, step_loss
