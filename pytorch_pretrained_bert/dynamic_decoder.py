@@ -129,8 +129,8 @@ class MaxOutHighway(nn.Module):
         alpha, _ = alpha.max(1)  # b*m
         alpha = alpha.view(-1, m) # b x m
 
-        alpha = alpha + mask_mult  # b x m
-        alpha = F.log_softmax(alpha, 1)  # b x m
+        logits = alpha + mask_mult  # b x m
+        alpha = F.log_softmax(logits, 1)  # b x m
         _, idx_i = torch.max(alpha, dim=1)
 
         if curr_mask is None:
@@ -146,4 +146,4 @@ class MaxOutHighway(nn.Module):
 #            step_loss = self.loss(alpha, target)
 #            step_loss = step_loss * curr_mask.float()
 
-        return idx_i, curr_mask, logits #, step_loss
+        return idx_i, curr_mask, logits #logits size b x m, step_loss
