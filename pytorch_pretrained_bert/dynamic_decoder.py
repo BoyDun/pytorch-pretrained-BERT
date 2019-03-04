@@ -10,6 +10,18 @@ import torch.nn.functional as F
 
 use_cuda = torch.cuda.is_available()
 
+
+def init_lstm_forget_bias(lstm):
+    for names in lstm._all_weights:
+        for name in names:
+            if name.startswith('bias_'):
+                # set forget bias to 1
+                bias = getattr(lstm, name)
+                n = bias.size(0)
+                start, end = n // 4, n // 2
+                bias.data.fill_(0.)
+                bias.data[start:end].fill_(1.)
+
 class DynamicDecoder(nn.Module):
     def __init__(self, hidden_dim, maxout_pool_size, max_dec_steps, dropout_ratio):
         super(DynamicDecoder, self).__init__()
