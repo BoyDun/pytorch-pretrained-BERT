@@ -1195,7 +1195,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         #loss: batch_size x hidden x context_length for logits
 
 
-        _ , _ , start_logits, end_logits = self.decoder(sequence_output, attention_mask) #each logits var is b x m
+        _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #each logits var is b x m
         
         if start_positions is not None and end_positions is not None:
             # If we are on multi-GPU, split add a dimension
