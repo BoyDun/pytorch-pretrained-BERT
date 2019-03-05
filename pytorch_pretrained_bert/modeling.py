@@ -1101,7 +1101,8 @@ class BertForTokenClassification(BertPreTrainedModel):
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, num_labels)
-        self.apply(self.init_bert_weights)
+        self.apply(self.init_bert_weights
+
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
@@ -1180,7 +1181,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 #         self.boundary = BoundaryPointer(
 #             mode="LSTM", input_size=, hidden_size=768, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
         #probably tune these hyperparams later
-        self.boundary = DynamicDecoder(hidden_dim=200, maxout_pool_size=16, max_dec_steps=4, dropout_ratio=0.15)
+        self.boundary = DynamicDecoder(hidden_dim=384, maxout_pool_size=16, max_dec_steps=4, dropout_ratio=0.15)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
@@ -1190,13 +1191,13 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 #         start_logits = start_logits.squeeze(-1)
 #         end_logits = end_logits.squeeze(-1)
         
-        #reshape sequence output to #B x m x 2l
+        #reshape sequence output to #B x m=len_document x 2l=2*size/len of hidden/encoding bc bidirectional lstm
         #answer: batch_size x hidden x 2 for answers
         #batch_size x hidden x context_length for logits
 
-        print(sequence_output.shape)
-        print(input_ids.shape)
-        print(attention_mask.shape)
+        print(sequence_output.shape) #([2, 384, 768]) = batch size x context_len x hidden_size
+        print(input_ids.shape) #([2, 384])
+        print(attention_mask.shape) #([2, 384])
 
         _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #each logits var is b x m
         
