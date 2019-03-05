@@ -1192,6 +1192,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 #         end_logits = end_logits.squeeze(-1)
         
         #reshape sequence output to #B x m=len_document x 2l=2*size/len of hidden/encoding bc bidirectional lstm
+
         #answer: batch_size x hidden x 2 for answers
         #batch_size x hidden x context_length for logits
 
@@ -1199,8 +1200,11 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         print(input_ids.shape) #([2, 384])
         print(attention_mask.shape) #([2, 384])
 
-        _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #each logits var is b x m
-        
+        _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #last logits var is b x m
+
+        print(start_logits.shape)
+        print(end_logits.shape)
+
         if start_positions is not None and end_positions is not None:
             # If we are on multi-GPU, split add a dimension
             if len(start_positions.size()) > 1:
