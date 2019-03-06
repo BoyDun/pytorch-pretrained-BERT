@@ -1195,15 +1195,15 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 
         #answer: batch_size x hidden x 2 for answers
         #batch_size x hidden x context_length for logits
-
-        print(sequence_output.shape) #([2, 384, 768]) = batch size x context_len x hidden_size
-        print(input_ids.shape) #([2, 384])
-        print(attention_mask.shape) #([2, 384])
+        # 
+        # print(sequence_output.shape) #([2, 384, 768]) = batch size x context_len x hidden_size
+        # print(input_ids.shape) #([2, 384])
+        # print(attention_mask.shape) #([2, 384])
 
         _ , _ , start_logits, end_logits = self.boundary(sequence_output, attention_mask) #last logits var is b x m
-
-        print(start_logits.shape)
-        print(end_logits.shape)
+        #
+        # print(start_logits.shape)
+        # print(end_logits.shape)
 
         if start_positions is not None and end_positions is not None:
             # If we are on multi-GPU, split add a dimension
