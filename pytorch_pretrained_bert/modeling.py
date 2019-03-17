@@ -33,7 +33,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from .file_utils import cached_path
-#from answer_pointer import BoundaryPointer
+from dcr import DCR
 
 logger = logging.getLogger(__name__)
 
@@ -1176,18 +1176,13 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         # self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
         self.apply(self.init_bert_weights)
-        #self.boundary = BoundaryPointer(
-        #    mode="LSTM", input_size=384, hidden_size=768, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
+        max_ans_len = 2
+        null_cosine_thresh = 0.85
+        self.DCR = DCR(max_ans_len, null_cosine_thresh)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None, idxs=None):
-        print(idxs)
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
-        logits = self.qa_outputs(sequence_output)
-        start_logits, end_logits = logits.split(1, dim=-1)
-        print(start_logits.size())
-        print(end_logits.size())
-        start_logits = start_logits.squeeze(-1)
-        end_logits = end_logits.squeeze(-1)
+        start_logits, end_logits = self.DCR(sequence_output)
 
         if start_positions is not None and end_positions is not None:
             # If we are on multi-GPU, split add a dimension
