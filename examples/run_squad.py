@@ -107,7 +107,8 @@ class InputFeatures(object):
                  segment_ids,
                  start_position=None,
                  end_position=None,
-                 is_impossible=None):
+                 is_impossible=None,
+                 idxs=None):
         self.unique_id = unique_id
         self.example_index = example_index
         self.doc_span_index = doc_span_index
@@ -120,6 +121,7 @@ class InputFeatures(object):
         self.start_position = start_position
         self.end_position = end_position
         self.is_impossible = is_impossible
+        self.idxs = idxs
 
 
 def read_squad_examples(input_file, is_training, version_2_with_negative):
@@ -269,7 +271,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 tokens.append(token)
                 segment_ids.append(0)
             tokens.append("[SEP]")
-            idxs.append(len(query_tokens)) # added
+            idxs.append(len(query_tokens + 1)) # added
             segment_ids.append(0)
 
             for i in range(doc_span.length):
@@ -281,7 +283,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 token_is_max_context[len(tokens)] = is_max_context
                 tokens.append(all_doc_tokens[split_token_index])
                 segment_ids.append(1)
-            idxs.append(len(query_tokens) + doc_span.length) # added
+            idxs.append(len(query_tokens) + doc_span.length + 2) # added
             tokens.append("[SEP]")
             segment_ids.append(1)
 
