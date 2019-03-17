@@ -29,8 +29,8 @@ class DCR(torch.nn.Module):
 			# seq_full is [384,786]
 			# dict of max end ind values (format: idx:val)
 			max_end_cos_vals = {}
-			start_logit_ex = torch.zeros(seq_len)
-			end_logit_ex = torch.zeros(seq_len)
+			start_logits_ex = torch.zeros(seq_len)
+			end_logits_ex = torch.zeros(seq_len)
 
 			#iterate over each passage token
 			for i in range(sep_idxs[0]+1, sep_idxs[1]):
@@ -42,7 +42,7 @@ class DCR(torch.nn.Module):
 					sim = self.cos_sim(torch.cat((ans_start_hidden, seq_full[j])), question_cat_repr) 
 					if sim > max_val:
 						end_ind = j
-						max_val = dim
+						max_val = sim
 
 				start_logits_ex[i] = max_val
 
