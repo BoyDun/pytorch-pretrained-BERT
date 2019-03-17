@@ -1184,6 +1184,8 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
+        print(start_logits.size())
+        print(end_logits.size())
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
 
