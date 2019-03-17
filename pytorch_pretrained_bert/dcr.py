@@ -12,7 +12,7 @@ class DCR(torch.nn.Module):
 		self.null_cosine_thresh = null_cosine_thresh
 
 	#returns logits
-	def forward(self, sequence_outputs, idxs, start_positions=None, end_positions=None):
+	def forward(self, sequence_outputs, idxs):
 		batch_sz = sequence_outputs.size()[0]
 		seq_len = sequence_outputs.size()[1]
 		hidden_sz = sequence_outputs.size()[2]

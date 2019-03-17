@@ -33,7 +33,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from .file_utils import cached_path
-from dcr import DCR
+from .dcr import DCR
 
 logger = logging.getLogger(__name__)
 
@@ -1182,7 +1182,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None, idxs=None):
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
-        start_logits, end_logits = self.DCR(sequence_output)
+        start_logits, end_logits = self.DCR(sequence_output, idxs)
 
         if start_positions is not None and end_positions is not None:
             # If we are on multi-GPU, split add a dimension
