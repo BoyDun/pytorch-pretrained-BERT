@@ -1176,8 +1176,8 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         # self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
         self.apply(self.init_bert_weights)
-        max_ans_len = 2
-        null_cosine_thresh = 0.85
+        max_ans_len = 3
+        null_cosine_thresh = 0.6
         self.DCR = DCR(max_ans_len, null_cosine_thresh)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None, idxs=None):
