@@ -258,6 +258,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
             start_offset += min(length, doc_stride)
 
         for (doc_span_index, doc_span) in enumerate(doc_spans):
+            idxs = []
             tokens = []
             token_to_orig_map = {}
             token_is_max_context = {}
@@ -268,6 +269,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 tokens.append(token)
                 segment_ids.append(0)
             tokens.append("[SEP]")
+            idxs.append(len(query_tokens)) # added
             segment_ids.append(0)
 
             for i in range(doc_span.length):
@@ -279,6 +281,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 token_is_max_context[len(tokens)] = is_max_context
                 tokens.append(all_doc_tokens[split_token_index])
                 segment_ids.append(1)
+            idxs.append(len(query_tokens) + doc_span.length) # added
             tokens.append("[SEP]")
             segment_ids.append(1)
 
@@ -322,6 +325,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
             if example_index < 20:
                 logger.info("*** Example ***")
                 logger.info("unique_id: %s" % (unique_id))
+                logger.info("idxs: %s", " ".join(idxs))
                 logger.info("example_index: %s" % (example_index))
                 logger.info("doc_span_index: %s" % (doc_span_index))
                 logger.info("tokens: %s" % " ".join(tokens))
@@ -349,6 +353,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                     unique_id=unique_id,
                     example_index=example_index,
                     doc_span_index=doc_span_index,
+                    idxs=idxs,
                     tokens=tokens,
                     token_to_orig_map=token_to_orig_map,
                     token_is_max_context=token_is_max_context,
