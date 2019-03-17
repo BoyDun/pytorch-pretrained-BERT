@@ -271,7 +271,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 tokens.append(token)
                 segment_ids.append(0)
             tokens.append("[SEP]")
-            idxs.append(len(query_tokens + 1)) # added
+            idxs.append(len(query_tokens)+1) # added
             segment_ids.append(0)
 
             for i in range(doc_span.length):
