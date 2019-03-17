@@ -1196,8 +1196,8 @@ class BertForQuestionAnswering(BertPreTrainedModel):
             end_positions.clamp_(0, ignored_index)
 
             loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
-            start_loss = loss_fct(start_logits.cuda(), start_positions.cuda())
-            end_loss = loss_fct(end_logits.cuda(), end_positions.cuda())
+            start_loss = loss_fct(start_logits, start_positions)
+            end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
             return total_loss
         else:
