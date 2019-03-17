@@ -17,8 +17,10 @@ class DCR(torch.nn.Module):
 		seq_len = sequence_outputs.size()[1]
 		hidden_sz = sequence_outputs.size()[2]
 
-		start_logits = torch.zeros((batch_sz, seq_len))
-		end_logits = start_logits = torch.zeros((batch_sz, seq_len))
+		cuda0 = torch.device('cuda:0')
+
+		start_logits = torch.zeros((batch_sz, seq_len), device=cuda0)
+		end_logits = start_logits = torch.zeros((batch_sz, seq_len), device=cuda0)
 
 		#iterate example by example over batch
 		for idx, single_ex in enumerate(sequence_outputs.split(1)):
@@ -29,8 +31,8 @@ class DCR(torch.nn.Module):
 			# seq_full is [384,786]
 			# dict of max end ind values (format: idx:val)
 			max_end_cos_vals = {}
-			start_logits_ex = torch.zeros(seq_len)
-			end_logits_ex = torch.zeros(seq_len)
+			start_logits_ex = torch.zeros(seq_len, device=cuda0)
+			end_logits_ex = torch.zeros(seq_len, device=cuda0)
 
 			#iterate over each passage token
 			for i in range(sep_idxs[0]+1, sep_idxs[1]):
