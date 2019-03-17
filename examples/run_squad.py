@@ -325,7 +325,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
             if example_index < 20:
                 logger.info("*** Example ***")
                 logger.info("unique_id: %s" % (unique_id))
-                logger.info("idxs: %s", " ".join(idxs))
+                logger.info("idxs: %s", str(idxs))
                 logger.info("example_index: %s" % (example_index))
                 logger.info("doc_span_index: %s" % (doc_span_index))
                 logger.info("tokens: %s" % " ".join(tokens))
