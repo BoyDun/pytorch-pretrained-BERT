@@ -69,4 +69,4 @@ class DCR(torch.nn.Module):
 			start_logits[idx] = start_logits_ex
 			end_logits[idx] = end_logits_ex
 
-		return start_logits.cuda(), end_logits.cuda()
+		return start_logits, end_logits
