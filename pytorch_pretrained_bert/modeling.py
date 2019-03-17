@@ -1179,7 +1179,8 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         #self.boundary = BoundaryPointer(
         #    mode="LSTM", input_size=384, hidden_size=768, bidirectional=True, dropout_p=0.4, enable_layer_norm=False)
 
-    def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None):
+    def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_positions=None, end_positions=None, idxs=None):
+        print(idxs)
         sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
