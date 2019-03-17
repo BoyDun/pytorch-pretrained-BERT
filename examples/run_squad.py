@@ -952,9 +952,9 @@ def main():
     if args.do_train:
         cached_train_features_file = args.train_file+'_{0}_{1}_{2}_{3}'.format(
             list(filter(None, args.bert_model.split('/'))).pop(), str(args.max_seq_length), str(args.doc_stride), str(args.max_query_length))
+        print(cached_train_features_file)
         train_features = None
         try:
-            print('FUCKKKKKDSADSHJDBAKSJDGVASKD')
             with open(cached_train_features_file, "rb") as reader:
                 train_features = pickle.load(reader)
         except:
