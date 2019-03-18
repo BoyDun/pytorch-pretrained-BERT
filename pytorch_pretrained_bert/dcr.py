@@ -70,7 +70,7 @@ class DCR(torch.nn.Module):
 				start_logits_ex *= -1
 				end_logits_ex *= -1
 				start_logits_ex[start_logits_ex==0] = -0.001
-				end_logits_ex[eng_logits_ex==0] = -0.001
+				end_logits_ex[end_logits_ex==0] = -0.001
 			# if float(max_logit) < self.null_cosine_thresh:
 				# start_logits_ex[0] = 1.0
 				# end_logits_ex[0] = 1.0
