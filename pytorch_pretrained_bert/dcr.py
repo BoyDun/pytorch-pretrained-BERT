@@ -58,7 +58,7 @@ class DCR(torch.nn.Module):
 					max_end_cos_vals[end_ind] = max_val
 					end_logits_ex[end_ind] = max_val
 
-			#max value in start and end logits
+			#max value in start logits
 			max_logit = torch.max(start_logits_ex)
 			#print("STD:")
 			#print(std)
@@ -67,14 +67,12 @@ class DCR(torch.nn.Module):
 			# if max logit value is under thresh (i.e. .75), then set 0th index to 1 (max val.) for both start and end logits to signify null.
 			
 			if max_logit < (start_logits_ex.std() + start_logits_ex.mean()) or max_logit < (end_logits_ex.std() + end_logits_ex.mean()):
-				print('smaller')
-
+				start_logits_ex *= -1
+				end_logits_ex *= -1
 			# if float(max_logit) < self.null_cosine_thresh:
 				# start_logits_ex[0] = 1.0
 				# end_logits_ex[0] = 1.0
-				start_logits_ex *= -1
-				end_logits_ex *= -1
-
+				
 			start_logits[idx] = start_logits_ex
 			end_logits[idx] = end_logits_ex
 
